@@ -76,7 +76,7 @@ export function CardCompareSlider({
     }
     resumeTimeoutRef.current = setTimeout(() => {
       setIsUserInteracting(false);
-    }, 2500);
+    }, 2800);
   };
 
   const handleValueChange = (val: number) => {

@@ -13,4 +13,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: "es2020",
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          "motion-vendor": ["framer-motion"],
+          "icons-vendor": ["lucide-react"],
+        },
+      },
+    },
+  },
 });

@@ -1,0 +1,42 @@
+export const GALLERY_ITEMS = [
+  {
+    id: "card-black",
+    title: "Carte Standard — Digital Agency Edition",
+    src: "/gallery/slide-1-card.jpg",
+    thumb: "/gallery/slide-1-card.jpg",
+    caption: "Design Officiel Digital Agency en noir mat avec emblème 3D néon et puce NFC intégrée.",
+    tag: "Standard",
+  },
+  {
+    id: "card-duo",
+    title: "بطاقة أعمال احترافية لهويتك — Standard & Personnalisée",
+    src: "/gallery/slide-2-duo.jpg",
+    thumb: "/gallery/slide-2-duo.jpg",
+    caption: "تصميم عصري ومخصص باسم شركتك وشعارك مع شريحة NFC وكود QR.",
+    tag: "Édition",
+  },
+  {
+    id: "profile-showcase",
+    title: "نمي عملك عبر الإنترنت — Profil Digital Connecté",
+    src: "/gallery/slide-3-profile.jpg",
+    thumb: "/gallery/slide-3-profile.jpg",
+    caption: "حلول رقمية متكاملة لنمو أعمالك ومشاركة معلومات الاتصال بلمسة واحدة.",
+    tag: "Profil",
+  },
+  {
+    id: "meeting-smart",
+    title: "رحلة هوية شركتك في بطاقة ذكية — Networking Prestige",
+    src: "/gallery/slide-4-meeting.jpg",
+    thumb: "/gallery/slide-4-meeting.jpg",
+    caption: "بطاقة عمل رقمية تفاعلية تربطك بعملائك وتعرّفهم بأعمالك وخدماتك بسهولة.",
+    tag: "Networking",
+  },
+  {
+    id: "compatibility-devices",
+    title: "بطاقة أعمال رقمية ذكية — Compatibilité NFC & QR Universelle",
+    src: "/gallery/slide-5-devices.jpg",
+    thumb: "/gallery/slide-5-devices.jpg",
+    caption: "شارك معلوماتك المهنية بضغطة واحدة عبر NFC أو QR على جميع أجهزة iOS & Android.",
+    tag: "Technologie",
+  },
+];

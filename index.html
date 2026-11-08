@@ -1,18 +1,77 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="fr" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="description" content="بطاقات العمل الذكية NFC من Digital Agency. شارك بياناتك وهويتك الرقمية بلمسة واحدة." />
-    <title>Digital Agency — بطاقات NFC الذكية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="#0B0C0E" />
+
+    <!-- SEO Meta Tags -->
+    <title>DIGITAL AGENCY — Carte de Visite NFC Connectée Premium en Algérie</title>
+    <meta name="description" content="La carte de visite connectée d'exception conçue en Algérie par Digital Agency. Partagez votre univers professionnel et vos coordonnées d'un simple geste sans application." />
+    <meta name="keywords" content="carte NFC Algérie, carte de visite connectée, carte NFC Alger, Digital Agency NFC, carte de visite intelligente, NTAG216, carte NFC personnalisée" />
+    <meta name="author" content="Digital Agency" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook / WhatsApp Preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Digital Agency NFC" />
+    <meta property="og:title" content="Carte de Visite NFC Connectée Premium — Digital Agency" />
+    <meta property="og:description" content="Partagez instantanément votre profil professionnel et vos coordonnées avec la carte NFC sans contact. Conçue en Algérie." />
+    <meta property="og:image" content="/card-black.png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="682" />
+    <meta property="og:locale" content="fr_DZ" />
+    <meta property="og:locale:alternate" content="ar_DZ" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DIGITAL AGENCY — Carte de Visite NFC Connectée" />
+    <meta name="twitter:description" content="Partagez vos coordonnées d'un simple geste sans contact. Disponible en Algérie avec livraison 58 wilayas." />
+    <meta name="twitter:image" content="/card-black.png" />
+
+    <!-- Favicon & Mobile Icons -->
+    <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+    <link rel="apple-touch-icon" href="/logo-emblem.png" />
+
+    <!-- Google Fonts Optimization: Preconnect & Font-Display Swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Alexandria:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Structured Data (JSON-LD) for SEO & Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "Carte de Visite NFC Connectée — Digital Agency",
+      "image": [
+        "/card-black.png",
+        "/card-white.png"
+      ],
+      "description": "Carte de visite intelligente avec technologie NFC sans contact NTAG216 et QR Code dynamique de secours.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Digital Agency"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "/",
+        "priceCurrency": "DZD",
+        "price": "2800",
+        "priceValidUntil": "2027-12-31",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "120"
+      }
+    }
+    </script>
   </head>
-  <body>
+  <body class="bg-white text-[#111111] antialiased selection:bg-[#FF08D9]/20 selection:text-black">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
