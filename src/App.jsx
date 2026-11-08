@@ -66,8 +66,8 @@ export default function App() {
                   type="button"
                   onClick={() => setLang("ar")}
                   className={`px-3 py-1 rounded-lg transition-all ${isAr
-                      ? "bg-white text-black font-bold shadow-xs"
-                      : "text-gray-500 hover:text-black"
+                    ? "bg-white text-black font-bold shadow-xs"
+                    : "text-gray-500 hover:text-black"
                     }`}
                 >
                   العربية
@@ -76,8 +76,8 @@ export default function App() {
                   type="button"
                   onClick={() => setLang("fr")}
                   className={`px-3 py-1 rounded-lg transition-all ${!isAr
-                      ? "bg-white text-black font-bold shadow-xs"
-                      : "text-gray-500 hover:text-black"
+                    ? "bg-white text-black font-bold shadow-xs"
+                    : "text-gray-500 hover:text-black"
                     }`}
                 >
                   Français
@@ -153,7 +153,7 @@ export default function App() {
         <div className="fixed bottom-4 inset-x-4 z-40 lg:hidden flex items-center justify-between p-3 rounded-2xl bg-black/95 backdrop-blur-md text-white shadow-xl border border-white/10 animate-fadeIn font-arabic">
           <div>
             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-              {selectedType === "standard" ? "ستاندار" : "مخصصة"}
+              {selectedType === "standard" ? "Standard" : "مخصصة"}
             </p>
             <PriceTag
               amount={selectedType === "standard" ? 2800 : 4000}

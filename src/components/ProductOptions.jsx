@@ -72,7 +72,7 @@ export function ProductOptions({
                 {selectedType === "standard" && <Check className="w-2.5 h-2.5 stroke-[3]" />}
               </div>
               <span className="font-bold text-xs sm:text-sm text-gray-900">
-                {isAr ? "ستاندار القياسية" : "Standard"}
+                {isAr ? "Standard " : "Standard"}
               </span>
             </div>
 
@@ -231,7 +231,7 @@ export function ProductOptions({
             </button>
 
             <h4 className="font-bold text-sm text-gray-900 flex items-center gap-1.5">
-              <span>{activeTooltip === "standard" ? (isAr ? "بطاقة ستاندار —" : "Carte Standard —") : (isAr ? "بطاقة مخصصة —" : "Carte Personnalisée —")}</span>
+              <span>{activeTooltip === "standard" ? (isAr ? "بطاقة Standard —" : "Carte Standard —") : (isAr ? "بطاقة مخصصة —" : "Carte Personnalisée —")}</span>
               <PriceTag amount={activeTooltip === "standard" ? 2800 : 4000} isAr={isAr} numClassName="font-mono" curClassName="font-arabic" />
             </h4>
 

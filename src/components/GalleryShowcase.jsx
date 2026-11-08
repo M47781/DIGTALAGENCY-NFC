@@ -50,9 +50,9 @@ export function GalleryShowcase({ isAr, selectedType = "standard" }) {
   return (
     <div className="w-full flex flex-col gap-2">
       
-      {/* Main Display Stage with Auto-Looping Carousel (Exact 1199x1312 aspect ratio) */}
+      {/* Main Display Stage with Auto-Looping Carousel (Exact 1199x1312 aspect ratio, no cropping) */}
       <div
-        className="relative w-full aspect-[1199/1312] max-h-[580px] rounded-2xl sm:rounded-3xl overflow-hidden bg-black border border-gray-200/90 shadow-2xs flex items-center justify-center group select-none cursor-pointer"
+        className="relative w-full aspect-[1199/1312] rounded-2xl sm:rounded-3xl overflow-hidden bg-black border border-gray-200/90 shadow-2xs flex items-center justify-center group select-none cursor-pointer"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onClick={() => setLightboxOpen(true)}
@@ -73,7 +73,7 @@ export function GalleryShowcase({ isAr, selectedType = "standard" }) {
               alt={currentItem.title}
               loading="eager"
               decoding="async"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain object-center"
             />
           </motion.div>
         </AnimatePresence>

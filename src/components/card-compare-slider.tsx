@@ -103,7 +103,7 @@ export function CardCompareSlider({
             <div className="slider-card-layer black-layer">
               <img
                 src="/card-black.png"
-                alt="بطاقة NFC القياسية"
+                alt="بطاقة NFC "
                 className="slider-card-img"
               />
             </div>
@@ -129,7 +129,7 @@ export function CardCompareSlider({
       <div className="compare-control-bar">
         <div className="card-legend-item">
           <span className="legend-indicator black" />
-          <span>بطاقة NFC القياسية</span>
+          <span>بطاقة NFC</span>
         </div>
 
         <div className="card-legend-item">

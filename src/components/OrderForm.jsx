@@ -53,8 +53,8 @@ export function OrderForm({
     setCustomCommuneInput("");
   }, [selectedWilayaCode]);
 
-  // Delivery fee: FREE if quantity >= 2!
-  const isFreeDelivery = quantity >= 2;
+  // Delivery fee: FREE only for customers ordering 5+ cards!
+  const isFreeDelivery = quantity >= 5;
   const rawDeliveryFee =
     deliveryMode === "home" ? currentWilaya.homeFee : currentWilaya.deskFee;
   const deliveryFee = isFreeDelivery ? 0 : rawDeliveryFee;
@@ -107,7 +107,7 @@ export function OrderForm({
     const orderData = {
       orderId: `DA-${Date.now().toString().slice(-6)}`,
       productType: selectedType === "standard"
-        ? isAr ? "ستاندار (دج 2,800)" : "Standard (2,800 DZD)"
+        ? isAr ? "Standard (دج 2,800)" : "Standard (2,800 DZD)"
         : isAr ? "مخصصة (دج 4,000)" : "Personnalisée (4,000 DZD)",
       customName: customName || fullName,
       customTitle: customTitle || "",
@@ -156,7 +156,7 @@ export function OrderForm({
       `🚚 *Mode :* ${deliveryLabel}`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━`,
       `💰 *Total à la livraison :* ${total.toLocaleString()} DZD`,
-      ...(isFreeDelivery ? [`🎁 *LIVRAISON OFFERTE (Offre spéciale 2+ cartes)*`] : []),
+      ...(isFreeDelivery ? [`🎁 *LIVRAISON OFFERTE (Offre spéciale 5+ cartes)*`] : []),
     ];
 
     const message = encodeURIComponent(lines.join("\n"));
@@ -203,17 +203,49 @@ export function OrderForm({
         </div>
       </div>
 
-      {/* Free Delivery Banner if Quantity >= 2 */}
-      {isFreeDelivery && (
-        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span>
-            {isAr
-              ? "🎉 مبروك! التوصيل مجاني لطلبك (عرض خاص عند طلب بطاقتين أو أكثر)"
-              : "🎉 Félicitations ! La livraison est offerte (Offre spéciale 2+ cartes)"}
-          </span>
-        </div>
-      )}
+      {/* Remarque Livraison Gratuite (Seulement plus de 5 cartes) */}
+      <div
+        className={`flex items-start gap-2.5 p-3 rounded-2xl text-xs font-semibold transition-all shadow-2xs ${
+          isFreeDelivery
+            ? "bg-emerald-50 border border-emerald-300 text-emerald-950"
+            : "bg-amber-50/90 border border-amber-200 text-amber-950"
+        }`}
+      >
+        {isFreeDelivery ? (
+          <>
+            <span className="relative flex h-3 w-3 mt-0.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <div className="flex flex-col gap-0.5">
+              <span className="font-extrabold text-[13px] text-emerald-800">
+                {isAr ? "🎉 ملاحظة: التوصيل مجاني لطلبك!" : "🎉 Remarque : Livraison 100% offerte !"}
+              </span>
+              <span className="text-[11px] text-emerald-700 font-normal">
+                {isAr
+                  ? "مبروك! استفدت من الشحن المجاني لأنك طلبت أكثر من 5 بطاقات."
+                  : "Félicitations ! Vous profitez de la livraison gratuite (commande de plus de 5 cartes)."}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+              <Truck className="w-4 h-4" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="font-extrabold text-[13px] text-amber-950">
+                {isAr ? "📌 ملاحظة:" : "📌 Remarque :"}
+              </span>
+              <span className="text-[11px] text-amber-900 font-medium leading-relaxed">
+                {isAr
+                  ? `التوصيل مجاني فقط عند طلب أكثر من 5 بطاقات (متبقي لك ${5 - quantity} ${5 - quantity === 1 ? "بطاقة" : "بطاقات"} للاستفادة من التوصيل المجاني).`
+                  : `La livraison est gratuite uniquement pour les commandes de plus de 5 cartes (${5 - quantity} restante${5 - quantity > 1 ? "s" : ""} pour en bénéficier).`}
+              </span>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Error Message */}
       {errorMsg && (
@@ -478,6 +510,22 @@ export function OrderForm({
                   curClassName="font-arabic"
                 />
               )}
+            </span>
+          </div>
+
+          {/* Note de livraison dans le résumé */}
+          <div className={`py-1.5 px-2.5 rounded-xl border text-[11px] flex items-center gap-1.5 ${
+            isFreeDelivery
+              ? "bg-emerald-50/80 border-emerald-200 text-emerald-800 font-semibold"
+              : "bg-gray-100/70 border-gray-200 text-gray-600"
+          }`}>
+            <span className="font-extrabold text-gray-900">
+              {isAr ? "ملاحظة :" : "Remarque :"}
+            </span>
+            <span>
+              {isFreeDelivery
+                ? (isAr ? "تم تفعيل التوصيل المجاني لطلبك (أكثر من 5 بطاقات) 🎉" : "Livraison offerte activée pour votre commande (5+ cartes) 🎉")
+                : (isAr ? `التوصيل مجاني فقط عند طلب أكثر من 5 بطاقات (متبقي ${5 - quantity})` : `Livraison gratuite uniquement à partir de 5 cartes (${5 - quantity} restante${5 - quantity > 1 ? "s" : ""})`)}
             </span>
           </div>
 
