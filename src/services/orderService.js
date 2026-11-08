@@ -8,28 +8,26 @@ const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "";
 const TELEGRAM_CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "";
 
 /**
- * Format order details into HTML message for Telegram
+ * Format order details into a clean, minimized HTML message for Telegram
+ * Displays only principal information without bloat
  */
 function formatTelegramMessage(order) {
-  return [
-    `🔔 <b>NOUVELLE COMMANDE REÇUE !</b>`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🆔 <b>Réf Commande :</b> <code>#${order.orderId}</code>`,
-    `📦 <b>Produit :</b> ${order.productType}`,
-    ...(order.customName ? [`✨ <b>Nom à graver :</b> <b>${order.customName}</b>`] : []),
-    ...(order.customTitle ? [`💼 <b>Poste / Entreprise :</b> ${order.customTitle}`] : []),
-    `🔢 <b>Quantité :</b> <b>${order.quantity}</b>`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━`,
+  const deliveryShort = (order.deliveryMode || "").includes("Domicile")
+    ? "À Domicile"
+    : "Stop Desk";
+
+  const lines = [
+    `🔔 <b>Commande #${order.orderId}</b>`,
     `👤 <b>Client :</b> ${order.fullName}`,
-    `📞 <b>Téléphone :</b> <a href="tel:${order.phone}">${order.phone}</a>`,
-    `📍 <b>Wilaya :</b> ${order.wilaya}`,
-    `🏠 <b>Commune :</b> ${order.commune}`,
-    `🚚 <b>Mode :</b> ${order.deliveryMode}`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `💰 <b>TOTAL À RÉGLER :</b> <b>${order.total.toLocaleString()} ${order.currency || "DZD"}</b>`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `📅 <i>Reçu le ${order.date || new Date().toLocaleString("fr-DZ")}</i>`,
-  ].join("\n");
+    `📞 <b>Tél :</b> <a href="tel:${order.phone}">${order.phone}</a>`,
+    `📍 <b>Adresse :</b> ${order.wilaya} (${order.commune})`,
+    `🚚 <b>Mode :</b> ${deliveryShort}`,
+    `📦 <b>Produit :</b> ${order.productType} (x${order.quantity})`,
+    ...(order.customName ? [`✨ <b>Gravure :</b> ${order.customName}`] : []),
+    `💰 <b>Total :</b> <b>${Number(order.total).toLocaleString()} DZD</b>`,
+  ];
+
+  return lines.join("\n");
 }
 
 /**
@@ -80,22 +78,20 @@ async function sendToGoogleSheet(order) {
 }
 
 /**
- * Main function: dispatch order to all configured channels
+ * Main function: dispatch order to configured channels
+ * Prioritizes Google Apps Script (which handles both Sheet + Telegram server-side)
+ * to avoid duplicate notifications.
  */
 export async function sendOrderNotification(order) {
-  const promises = [];
-
+  // 1. If Google Sheet Webhook is active, it saves to Sheets AND sends to Telegram in 1 go
   if (GOOGLE_SHEET_URL) {
-    promises.push(sendToGoogleSheet(order));
+    await sendToGoogleSheet(order);
+    return;
   }
 
-  // If direct Telegram is configured (standalone or as extra fallback)
+  // 2. Standalone fallback: only send direct from frontend if Google Sheet is not configured
   if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-    promises.push(sendToTelegramDirect(order));
-  }
-
-  if (promises.length > 0) {
-    await Promise.allSettled(promises);
+    await sendToTelegramDirect(order);
   }
 }
 

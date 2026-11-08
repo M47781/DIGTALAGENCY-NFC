@@ -13,10 +13,10 @@
  */
 
 // 1. Token de votre bot Telegram (obtenu auprès de @BotFather)
-var TELEGRAM_BOT_TOKEN = "VOTRE_BOT_TOKEN_ICI"; // Ex: "7123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
+var TELEGRAM_BOT_TOKEN = "9095183268:AAEyBlxi9ptyFRug5RfZWlTLSYmIPm8_O5Q";
 
 // 2. Chat ID de votre compte ou de votre groupe Telegram (obtenu via @userinfobot)
-var TELEGRAM_CHAT_ID = "VOTRE_CHAT_ID_ICI";     // Ex: "123456789" (ou "-100xxxxxx" pour un groupe)
+var TELEGRAM_CHAT_ID = "6162329381";
 
 
 /**
@@ -134,29 +134,22 @@ function saveToSheet(order) {
 }
 
 /**
- * Envoyer un message Telegram formaté avec emojis et lien d'appel direct
+ * Envoyer un message Telegram compact et minimisé (Uniquement les informations principales)
  */
 function sendTelegramNotification(order) {
   var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage";
 
+  var deliveryShort = (order.deliveryMode || "").indexOf("Domicile") !== -1 ? "À Domicile" : "Stop Desk";
+
   var lines = [
-    "🔔 <b>NOUVELLE COMMANDE REÇUE — DIGITAL AGENCY</b>",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "🆔 <b>Réf :</b> <code>#" + (order.orderId || "N/A") + "</code>",
-    "📦 <b>Produit :</b> " + (order.productType || ""),
-    (order.customName ? "✨ <b>Nom à graver :</b> <b>" + order.customName + "</b>" : ""),
-    (order.customTitle ? "💼 <b>Poste / Société :</b> " + order.customTitle : ""),
-    "🔢 <b>Quantité :</b> <b>" + (order.quantity || 1) + "</b>",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "👤 <b>Client :</b> <b>" + (order.fullName || "") + "</b>",
-    "📞 <b>Téléphone :</b> <a href='tel:" + (order.phone || "") + "'>" + (order.phone || "") + "</a> <i>(Cliquer pour appeler)</i>",
-    "📍 <b>Wilaya :</b> " + (order.wilaya || ""),
-    "🏠 <b>Commune :</b> " + (order.commune || ""),
-    "🚚 <b>Mode :</b> " + (order.deliveryMode || ""),
-    "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "💰 <b>TOTAL À ENCAISSER :</b> <b>" + Number(order.total || 0).toLocaleString() + " DZD</b>",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "📅 <i>" + Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy HH:mm") + " (Heure Alger)</i>"
+    "🔔 <b>Commande #" + (order.orderId || "N/A") + "</b>",
+    "👤 <b>Client :</b> " + (order.fullName || "N/A"),
+    "📞 <b>Tél :</b> <a href='tel:" + (order.phone || "") + "'>" + (order.phone || "") + "</a>",
+    "📍 <b>Adresse :</b> " + (order.wilaya || "") + " (" + (order.commune || "") + ")",
+    "🚚 <b>Mode :</b> " + deliveryShort,
+    "📦 <b>Produit :</b> " + (order.productType || "") + " (x" + (order.quantity || 1) + ")",
+    (order.customName ? "✨ <b>Gravure :</b> " + order.customName : ""),
+    "💰 <b>Total :</b> <b>" + Number(order.total || 0).toLocaleString() + " DZD</b>"
   ].filter(function(line) { return line !== ""; }).join("\n");
 
   var payload = {
