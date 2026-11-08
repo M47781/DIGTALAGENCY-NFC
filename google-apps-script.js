@@ -3,90 +3,120 @@
  * GOOGLE APPS SCRIPT — LIER COMMANDES NFC VERS GOOGLE SHEETS & BOT TELEGRAM
  * =========================================================================
  * 
- * INSTRUCTIONS D'INSTALLATION EN 3 ÉTAPES FACILES :
+ * Ce script permet de :
+ * 1. Enregistrer automatiquement chaque commande dans votre Google Sheet
+ * 2. Envoyer une notification instantanée avec les détails sur votre Telegram
  * 
- * 1. Créez un nouveau Google Sheet (Feuille de calcul) sur Google Drive.
- * 2. Dans le menu du haut, cliquez sur "Extensions" > "Apps Script".
- * 3. Supprimez tout le code existant dans l'éditeur et collez l'intégralité de ce fichier.
- * 4. Remplissez vos variables TELEGRAM ci-dessous (si vous utilisez le bot Telegram).
- * 5. Cliquez sur le bouton bleu "Déployer" (en haut à droite) > "Nouveau déploiement".
- *    - Type : "Application Web"
- *    - Exécuter en tant que : "Moi"
- *    - Qui a accès : "Tout le monde" (Important pour que le site puisse envoyer les commandes !)
- * 6. Cliquez sur "Déployer", accordez les autorisations Google, puis copiez l'URL de l'application Web.
- * 7. Collez cette URL dans votre fichier .env : VITE_GOOGLE_SHEET_WEBHOOK_URL="VOTRE_URL_ICI"
- * =========================================================================
+ * -------------------------------------------------------------------------
+ * CONFIGURATION DU BOT TELEGRAM (2 variables à renseigner ci-dessous) :
+ * -------------------------------------------------------------------------
  */
 
-// ⚙️ CONFIGURATION TELEGRAM (Optionnel mais recommandé)
-var TELEGRAM_BOT_TOKEN = "VOTRE_BOT_TOKEN_ICI"; // Ex: 123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
-var TELEGRAM_CHAT_ID = "VOTRE_CHAT_ID_ICI";     // Ex: 987654321 ou -100xxxxxxxxxx pour un groupe
+// 1. Token de votre bot Telegram (obtenu auprès de @BotFather)
+var TELEGRAM_BOT_TOKEN = "VOTRE_BOT_TOKEN_ICI"; // Ex: "7123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
+
+// 2. Chat ID de votre compte ou de votre groupe Telegram (obtenu via @userinfobot)
+var TELEGRAM_CHAT_ID = "VOTRE_CHAT_ID_ICI";     // Ex: "123456789" (ou "-100xxxxxx" pour un groupe)
+
 
 /**
- * Fonction appelée automatiquement lors d'une nouvelle commande (POST)
+ * Test simple : Ouvrir l'URL dans le navigateur pour vérifier que le script fonctionne
+ */
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    message: "Google Apps Script Web App est opérationnel et prêt à recevoir les commandes !"
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Fonction appelée automatiquement par le site web lors d'une commande
  */
 function doPost(e) {
   try {
-    var rawData = e.postData.contents;
-    var data = JSON.parse(rawData);
+    var data = null;
 
-    // 1. Enregistrement dans le Google Sheet
+    if (e && e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err) {
+        data = e.parameter;
+      }
+    } else if (e && e.parameter) {
+      data = e.parameter;
+    }
+
+    if (!data) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: "Aucune donnée reçue"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 1. Sauvegarde dans Google Sheets
     saveToSheet(data);
 
-    // 2. Envoi de la notification au Bot Telegram
-    if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== "VOTRE_BOT_TOKEN_ICI" && TELEGRAM_CHAT_ID) {
+    // 2. Envoi de l'alerte sur Telegram
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== "VOTRE_BOT_TOKEN_ICI" && TELEGRAM_CHAT_ID && TELEGRAM_CHAT_ID !== "VOTRE_CHAT_ID_ICI") {
       sendTelegramNotification(data);
     }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "success", orderId: data.orderId }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      orderId: data.orderId || ""
+    })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
 /**
- * Sauvegarder la commande dans la feuille active
+ * Sauvegarder la commande dans la feuille Google Sheet active
  */
 function saveToSheet(order) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
   // Création des en-têtes si la feuille est vide
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
+    var headers = [
       "Date & Heure",
       "Réf Commande",
       "Nom & Prénom",
       "Téléphone",
       "Wilaya",
       "Commune",
-      "Type de Carte",
-      "Nom à Graver",
-      "Poste / Entreprise",
+      "Modèle Carte",
+      "Nom Gravé",
+      "Poste / Société",
       "Quantité",
-      "Mode de Livraison",
+      "Mode Livraison",
       "Frais Livraison",
       "Total à Payer (DZD)"
-    ]);
+    ];
+    sheet.appendRow(headers);
 
-    // Formatage de la ligne d'en-tête (Gras, fond sombre, texte blanc)
-    var headerRange = sheet.getRange(1, 1, 1, 13);
+    // Style moderne pour l'en-tête (Gras, fond noir, texte blanc)
+    var headerRange = sheet.getRange(1, 1, 1, headers.length);
     headerRange.setFontWeight("bold");
     headerRange.setBackground("#111111");
     headerRange.setFontColor("#FFFFFF");
+    headerRange.setHorizontalAlignment("center");
     sheet.setFrozenRows(1);
   }
 
-  // Ajout de la nouvelle commande
+  // Formatage de la date locale algérienne (GMT+1)
+  var dateStr = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy HH:mm:ss");
+
+  // Ajout de la commande
   sheet.appendRow([
-    new Date(),
+    dateStr,
     order.orderId || "",
     order.fullName || "",
-    order.phone || "",
+    "'" + (order.phone || ""), // Apostrophe pour conserver le 0 initial du numéro de téléphone
     order.wilaya || "",
     order.commune || "",
     order.productType || "",
@@ -97,31 +127,36 @@ function saveToSheet(order) {
     order.deliveryFee || 0,
     order.total || 0
   ]);
+
+  // Aligner les cellules
+  var lastRow = sheet.getLastRow();
+  sheet.getRange(lastRow, 1, 1, 13).setHorizontalAlignment("center");
 }
 
 /**
- * Envoyer un message formaté sur Telegram
+ * Envoyer un message Telegram formaté avec emojis et lien d'appel direct
  */
 function sendTelegramNotification(order) {
   var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage";
 
   var lines = [
-    "🔔 <b>NOUVELLE COMMANDE NFC !</b>",
+    "🔔 <b>NOUVELLE COMMANDE REÇUE — DIGITAL AGENCY</b>",
     "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "🆔 <b>Réf :</b> <code>#" + (order.orderId || "") + "</code>",
+    "🆔 <b>Réf :</b> <code>#" + (order.orderId || "N/A") + "</code>",
     "📦 <b>Produit :</b> " + (order.productType || ""),
-    (order.customName ? "✨ <b>Nom gravé :</b> <b>" + order.customName + "</b>" : ""),
-    (order.customTitle ? "💼 <b>Poste :</b> " + order.customTitle : ""),
+    (order.customName ? "✨ <b>Nom à graver :</b> <b>" + order.customName + "</b>" : ""),
+    (order.customTitle ? "💼 <b>Poste / Société :</b> " + order.customTitle : ""),
     "🔢 <b>Quantité :</b> <b>" + (order.quantity || 1) + "</b>",
     "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "👤 <b>Client :</b> " + (order.fullName || ""),
-    "📞 <b>Téléphone :</b> <a href='tel:" + (order.phone || "") + "'>" + (order.phone || "") + "</a>",
+    "👤 <b>Client :</b> <b>" + (order.fullName || "") + "</b>",
+    "📞 <b>Téléphone :</b> <a href='tel:" + (order.phone || "") + "'>" + (order.phone || "") + "</a> <i>(Cliquer pour appeler)</i>",
     "📍 <b>Wilaya :</b> " + (order.wilaya || ""),
     "🏠 <b>Commune :</b> " + (order.commune || ""),
     "🚚 <b>Mode :</b> " + (order.deliveryMode || ""),
     "━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "💰 <b>TOTAL À RÉGLER :</b> <b>" + Number(order.total || 0).toLocaleString() + " DZD</b>",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━"
+    "💰 <b>TOTAL À ENCAISSER :</b> <b>" + Number(order.total || 0).toLocaleString() + " DZD</b>",
+    "━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "📅 <i>" + Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy HH:mm") + " (Heure Alger)</i>"
   ].filter(function(line) { return line !== ""; }).join("\n");
 
   var payload = {
@@ -141,3 +176,20 @@ function sendTelegramNotification(order) {
   UrlFetchApp.fetch(url, options);
 }
 
+/**
+ * 🧪 FONCTION DE TEST (Exécutable directement dans Apps Script pour vérifier Telegram)
+ * Cliquez sur "testNotification" dans la barre d'outils puis cliquez sur "Exécuter"
+ */
+function testNotification() {
+  sendTelegramNotification({
+    orderId: "TEST-001",
+    productType: "Standard (2,800 DZD)",
+    fullName: "Client Test",
+    phone: "0555123456",
+    wilaya: "Alger",
+    commune: "Alger Centre",
+    deliveryMode: "À Domicile (48h)",
+    quantity: 1,
+    total: 3250
+  });
+}

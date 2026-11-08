@@ -65,12 +65,12 @@ async function sendToGoogleSheet(order) {
   if (!GOOGLE_SHEET_URL) return;
 
   try {
-    // Mode no-cors avoids Google Apps Script 302 redirect CORS issues in browsers
+    // Mode 'no-cors' with 'text/plain' prevents browser CORS preflight (OPTIONS) blocks
     await fetch(GOOGLE_SHEET_URL, {
       method: "POST",
       mode: "no-cors",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/plain;charset=utf-8",
       },
       body: JSON.stringify(order),
     });
